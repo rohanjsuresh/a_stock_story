@@ -64,7 +64,7 @@ def get_avg_prices(tickers, start, end):
 
 # description:
 #   given a start date (YYYY-MM) and and end date (YYYY-MM) and a time interval x, return all the
-#   pairs of time intervals from start to end increasing by x
+#   pairs of time intervals from start to end increasing by x.
 # args:
 #   start - string containing start date in the form YYYY-MM
 #   end - string containing end date in the form YYYY-MM
@@ -86,23 +86,23 @@ def get_time_intervals(start, end, interval):
     intervals = []
     
     # get dates that are each interval length 
-    while (start_year != end_year or start_month != end_month):
+    while (start_year < end_year or start_month < end_month):
         temp_year = start_year
         temp_month = start_month
 
+        start_month += interval
         # if the month is already december, go to new year date
-        if start_month == 12:
-            start_month = 1
-            start_year += 1
-        # else just increment month by 1
-        else:
-            start_month += 1
+        if start_month > 12:
+            start_year += int(start_month / 12)
+            start_month = (start_month) % 12
 
-        # add new start - end interval to intervals array
+        # final end date should be end date specificed by user
+        if start_year >= end_year and start_month >= end_month:
+            start_year = end_year
+            start_month = end_month
+
+        # add new start - end interval to interval array
         start_str = str(temp_year) + "-" + str(temp_month) + "-" + "1"
         end_str = str(start_year) + "-" + str(start_month) + "-" + "1"
         intervals.append((start_str, end_str))
     return intervals
-
-
-
