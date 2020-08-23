@@ -53,8 +53,8 @@ def get_avg_prices(tickers, start, end):
         # try and get avg high price
         try:
             data = pdr.get_data_yahoo(ticker, start=start, end=end)
-            # print(data['High'].mean())
-            # print(data['Low'].mean())
+            print(data['High'].mean())
+            print(data['Low'].mean())
             avg_high[ticker] = data['High'].mean()
             avg_low[ticker] = data['Low'].mean()
         # else add ticker to data_not_available 
@@ -62,6 +62,47 @@ def get_avg_prices(tickers, start, end):
             data_not_available.append(ticker)
     return avg_high, avg_low,data_not_available
 
+# description:
+#   given a start date (YYYY-MM) and and end date (YYYY-MM) and a time interval x, return all the
+#   pairs of time intervals from start to end increasing by x
+# args:
+#   start - string containing start date in the form YYYY-MM
+#   end - string containing end date in the form YYYY-MM
+#   interval - length of time interval we want in months
+# return:
+#   intervals - array with each value being a tuple with its own start date and end date of interval length
+def get_time_intervals(start, end, interval):
 
-tickers = get_dow_tickers()
-avg_high, avg_low,data_not_available = get_avg_prices(tickers, "2019-01-01", "2019-02-01")
+    # split start/end dates into year and month variables
+    start_year, start_month = start.split("-")
+    end_year, end_month = end.split("-")
+
+    # convert string to int
+    start_year = int(start_year)
+    start_month = int(start_month)
+    end_year = int(end_year)
+    end_month = int(end_month)
+
+    intervals = []
+    
+    # get dates that are each interval length 
+    while (start_year != end_year or start_month != end_month):
+        temp_year = start_year
+        temp_month = start_month
+
+        # if the month is already december, go to new year date
+        if start_month == 12:
+            start_month = 1
+            start_year += 1
+        # else just increment month by 1
+        else:
+            start_month += 1
+
+        # add new start - end interval to intervals array
+        start_str = str(temp_year) + "-" + str(temp_month) + "-" + "1"
+        end_str = str(start_year) + "-" + str(start_month) + "-" + "1"
+        intervals.append((start_str, end_str))
+    return intervals
+
+
+
