@@ -106,3 +106,95 @@ def get_time_intervals(start, end, interval):
         end_str = str(start_year) + "-" + str(start_month) + "-" + "1"
         intervals.append((start_str, end_str))
     return intervals
+
+# description:
+#   given a start date (YYYY-MM) and and end date (YYYY-MM) and a time interval x, return all the
+#   highs and lows corresponding to each interval
+# args:
+#   ticker - ticker for a specific company
+#   start - string containing start date in the form YYYY-MM
+#   end - string containing end date in the form YYYY-MM
+#   interval_length - length of time interval we want in months
+# return:
+#   highs - price highs for each corresponding interval
+#   lows - price lows for each corresponding interval
+#   intervals - array with each value being a tuple with its own start date and end date of interval length
+def get_highs_and_lows_for_ticker(ticker, start, end, interval_length):
+    
+    # get list of time increments between the overall time interval 
+    intervals = get_time_intervals(start, end, interval_length)
+    
+    highs = []
+    lows = []
+    del_me = []
+    
+    # iterate through intervals and get avg high and low prices for each interval
+    for i in range(len(intervals)):
+        interval = intervals[i]
+        h, l, na = get_avg_prices([ticker], interval[0], interval[1])
+        if len(na) != 0:
+            del_me.append(i)
+        else:
+            highs.append(h[ticker])
+            lows.append(l[ticker])
+    
+    # mark each time data was not available for the given time interval
+    for idx in del_me:
+        intervals[idx] = -1
+    
+    # remove marked times
+    intervals = list(filter(lambda a: a != -1, intervals))
+    
+    return highs, lows, intervals
+
+
+# description:
+#   plot a line graph with highs and low prices over the interval
+# args:
+#   ticker - ticker for a specific company
+#   highs - price highs for each corresponding interval
+#   lows - price lows for each corresponding interval
+#   intervals - array with each value being a tuple with its own start date and end date of interval length
+# return:
+# 
+def plot_single_company(ticker, highs, lows, intervals):
+    
+    time_arr = [ticker]
+    
+    intervals_formatted = []
+    for i in range(len(intervals)):
+        intervals_formatted.append(str(intervals[i][0]) + " - " + str(intervals[i][1]))
+    
+    plt.plot(intervals_formatted, highs, label = "Highs")
+    plt.plot(intervals_formatted, lows, label = "Lows")
+    
+    # if no data available for any interval then just print error 
+    if len(intervals) == 0:
+        plt.suptitle("No data available for " + ticker)
+    else:
+        plt.suptitle("Highs and Lows of " + ticker + " from " + intervals[0][0] + "-\n" + intervals[-1][1])
+    plt.ylabel('Price')
+    plt.xlabel('Interval')
+    plt.legend()
+    plt.show()
+    
+    
+# description:
+#   plot graphs (if data available for all 30 DOW companies
+# args:
+#   start - string containing start date in the form YYYY-MM
+#   end - string containing end date in the form YYYY-MM
+#   interval_length - length of time interval we want in months
+# return:
+# 
+def plot_highs_and_lows_for_all_dow_30(start, end, interval_length):
+    
+    tickers = get_dow_tickers()
+    
+    # plot graph for each ticker
+    for ticker in tickers: 
+        h, l, i = get_highs_and_lows_for_ticker(ticker, start, end, interval_length)
+        plot_single_company(ticker, h, l, i)
+        
+
+        
