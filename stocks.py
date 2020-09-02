@@ -53,8 +53,8 @@ def get_avg_prices(tickers, start, end):
         # try and get avg high price
         try:
             data = pdr.get_data_yahoo(ticker, start=start, end=end)
-            print(data['High'].mean())
-            print(data['Low'].mean())
+            # print(data['High'].mean())
+            # print(data['Low'].mean())
             avg_high[ticker] = data['High'].mean()
             avg_low[ticker] = data['Low'].mean()
         # else add ticker to data_not_available 
